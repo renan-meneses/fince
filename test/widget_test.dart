@@ -16,6 +16,11 @@ import 'package:fince/features/auth/domain/usecases/login.dart';
 import 'package:fince/features/auth/domain/usecases/logout.dart';
 import 'package:fince/features/auth/domain/usecases/register.dart';
 import 'package:fince/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:fince/features/budgets/domain/repositories/budget_repository.dart';
+import 'package:fince/features/budgets/domain/usecases/create_budget.dart';
+import 'package:fince/features/budgets/domain/usecases/delete_budget.dart';
+import 'package:fince/features/budgets/domain/usecases/watch_budgets.dart';
+import 'package:fince/features/budgets/presentation/cubit/budgets_cubit.dart';
 import 'package:fince/features/categories/domain/repositories/category_repository.dart';
 import 'package:fince/features/categories/domain/usecases/create_category.dart';
 import 'package:fince/features/categories/domain/usecases/delete_category.dart';
@@ -64,6 +69,8 @@ class _MockCreditCardRepository extends Mock
 
 class _MockRecurringRepository extends Mock
     implements RecurringTransactionRepository {}
+
+class _MockBudgetRepository extends Mock implements BudgetRepository {}
 
 void main() {
   setUpAll(() {
@@ -164,6 +171,15 @@ void main() {
       generate: GenerateDueOccurrences(recurringRepo),
     );
 
+    final budgetRepo = _MockBudgetRepository();
+    when(() => budgetRepo.watchBudgets(any()))
+        .thenAnswer((_) => Stream.value(const []));
+    final budgetsCubit = BudgetsCubit(
+      watchBudgets: WatchBudgets(budgetRepo),
+      createBudget: CreateBudget(budgetRepo),
+      deleteBudget: DeleteBudget(budgetRepo),
+    );
+
     await tester.pumpWidget(
       FinceApp(
         router: AppRouter(
@@ -174,6 +190,7 @@ void main() {
           dashboardCubit,
           creditCardsCubit,
           recurringCubit,
+          budgetsCubit,
         ).router,
         authCubit: authCubit,
       ),

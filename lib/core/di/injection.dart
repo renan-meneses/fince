@@ -21,6 +21,13 @@ import '../../features/auth/domain/usecases/login.dart';
 import '../../features/auth/domain/usecases/logout.dart';
 import '../../features/auth/domain/usecases/register.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
+import '../../features/budgets/data/datasources/budget_local_data_source.dart';
+import '../../features/budgets/data/repositories/budget_repository_impl.dart';
+import '../../features/budgets/domain/repositories/budget_repository.dart';
+import '../../features/budgets/domain/usecases/create_budget.dart';
+import '../../features/budgets/domain/usecases/delete_budget.dart';
+import '../../features/budgets/domain/usecases/watch_budgets.dart';
+import '../../features/budgets/presentation/cubit/budgets_cubit.dart';
 import '../../features/categories/data/datasources/category_local_data_source.dart';
 import '../../features/categories/data/repositories/category_repository_impl.dart';
 import '../../features/categories/domain/repositories/category_repository.dart';
@@ -93,6 +100,7 @@ Future<void> configureDependencies(AppConfig config) async {
   _registerDashboardModule();
   _registerCreditCardsModule();
   _registerRecurringModule();
+  _registerBudgetsModule();
   sl.registerLazySingleton<AppRouter>(
     () => AppRouter(
       sl<AuthCubit>(),
@@ -102,6 +110,7 @@ Future<void> configureDependencies(AppConfig config) async {
       sl<DashboardCubit>(),
       sl<CreditCardsCubit>(),
       sl<RecurringCubit>(),
+      sl<BudgetsCubit>(),
     ),
   );
 }
@@ -270,5 +279,28 @@ void _registerRecurringModule() {
   );
   sl.registerLazySingleton<RecurringCubit>(
     () => RecurringCubit(watch: sl(), delete: sl(), generate: sl()),
+  );
+}
+
+void _registerBudgetsModule() {
+  sl.registerLazySingleton<BudgetLocalDataSource>(
+    () => BudgetLocalDataSource(sl<AppDatabase>()),
+  );
+  sl.registerLazySingleton<BudgetRepository>(
+    () => BudgetRepositoryImpl(
+      local: sl(),
+      transactions: sl(),
+      categories: sl(),
+    ),
+  );
+  sl.registerLazySingleton<WatchBudgets>(() => WatchBudgets(sl()));
+  sl.registerLazySingleton<CreateBudget>(() => CreateBudget(sl()));
+  sl.registerLazySingleton<DeleteBudget>(() => DeleteBudget(sl()));
+  sl.registerLazySingleton<BudgetsCubit>(
+    () => BudgetsCubit(
+      watchBudgets: sl(),
+      createBudget: sl(),
+      deleteBudget: sl(),
+    ),
   );
 }
