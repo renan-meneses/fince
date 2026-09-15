@@ -44,6 +44,9 @@ import 'package:fince/features/goals/domain/usecases/delete_goal.dart';
 import 'package:fince/features/goals/domain/usecases/deposit_to_goal.dart';
 import 'package:fince/features/goals/domain/usecases/watch_goals.dart';
 import 'package:fince/features/goals/presentation/cubit/goals_cubit.dart';
+import 'package:fince/features/insights/domain/repositories/insight_repository.dart';
+import 'package:fince/features/insights/domain/usecases/generate_insights.dart';
+import 'package:fince/features/insights/presentation/cubit/insights_cubit.dart';
 import 'package:fince/features/recurring_transactions/domain/repositories/recurring_transaction_repository.dart';
 import 'package:fince/features/recurring_transactions/domain/usecases/delete_recurring_transaction.dart';
 import 'package:fince/features/recurring_transactions/domain/usecases/generate_due_occurrences.dart';
@@ -88,6 +91,8 @@ class _MockBudgetRepository extends Mock implements BudgetRepository {}
 class _MockGoalRepository extends Mock implements GoalRepository {}
 
 class _MockReportRepository extends Mock implements ReportRepository {}
+
+class _MockInsightRepository extends Mock implements InsightRepository {}
 
 void main() {
   setUpAll(() {
@@ -244,6 +249,13 @@ void main() {
       byAccount: GetExpensesByAccount(reportRepo),
     );
 
+    final insightRepo = _MockInsightRepository();
+    when(() => insightRepo.generateInsights(month: any(named: 'month')))
+        .thenAnswer((_) async => const []);
+    final insightsCubit = InsightsCubit(
+      generateInsights: GenerateInsights(insightRepo),
+    );
+
     await tester.pumpWidget(
       FinceApp(
         router: AppRouter(
@@ -257,6 +269,7 @@ void main() {
           budgetsCubit,
           goalsCubit,
           reportsCubit,
+          insightsCubit,
         ).router,
         authCubit: authCubit,
       ),

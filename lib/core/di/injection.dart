@@ -57,6 +57,12 @@ import '../../features/goals/domain/usecases/delete_goal.dart';
 import '../../features/goals/domain/usecases/deposit_to_goal.dart';
 import '../../features/goals/domain/usecases/watch_goals.dart';
 import '../../features/goals/presentation/cubit/goals_cubit.dart';
+import '../../features/insights/data/repositories/insight_repository_impl.dart';
+import '../../features/insights/data/repositories/rule_based_insight_repository.dart';
+import '../../features/insights/domain/repositories/financial_assistant_repository.dart';
+import '../../features/insights/domain/repositories/insight_repository.dart';
+import '../../features/insights/domain/usecases/generate_insights.dart';
+import '../../features/insights/presentation/cubit/insights_cubit.dart';
 import '../../features/recurring_transactions/data/datasources/recurring_transaction_local_data_source.dart';
 import '../../features/recurring_transactions/data/repositories/recurring_transaction_repository_impl.dart';
 import '../../features/recurring_transactions/domain/repositories/recurring_transaction_repository.dart';
@@ -118,6 +124,7 @@ Future<void> configureDependencies(AppConfig config) async {
   _registerBudgetsModule();
   _registerGoalsModule();
   _registerReportsModule();
+  _registerInsightsModule();
   sl.registerLazySingleton<AppRouter>(
     () => AppRouter(
       sl<AuthCubit>(),
@@ -130,6 +137,7 @@ Future<void> configureDependencies(AppConfig config) async {
       sl<BudgetsCubit>(),
       sl<GoalsCubit>(),
       sl<ReportsCubit>(),
+      sl<InsightsCubit>(),
     ),
   );
 }
@@ -366,5 +374,23 @@ void _registerReportsModule() {
       byCategory: sl(),
       byAccount: sl(),
     ),
+  );
+}
+
+void _registerInsightsModule() {
+  sl.registerLazySingleton<FinancialAssistantRepository>(
+    () => RuleBasedInsightRepository(),
+  );
+  sl.registerLazySingleton<InsightRepository>(
+    () => InsightRepositoryImpl(
+      transactions: sl(),
+      categories: sl(),
+      budgets: sl(),
+      assistant: sl(),
+    ),
+  );
+  sl.registerLazySingleton<GenerateInsights>(() => GenerateInsights(sl()));
+  sl.registerLazySingleton<InsightsCubit>(
+    () => InsightsCubit(generateInsights: sl()),
   );
 }
