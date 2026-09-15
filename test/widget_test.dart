@@ -21,6 +21,14 @@ import 'package:fince/features/categories/domain/usecases/delete_category.dart';
 import 'package:fince/features/categories/domain/usecases/seed_default_categories.dart';
 import 'package:fince/features/categories/domain/usecases/watch_categories.dart';
 import 'package:fince/features/categories/presentation/cubit/categories_cubit.dart';
+import 'package:fince/features/transactions/domain/entities/transaction_filter.dart';
+import 'package:fince/features/transactions/domain/repositories/transaction_repository.dart';
+import 'package:fince/features/transactions/domain/usecases/create_transaction.dart';
+import 'package:fince/features/transactions/domain/usecases/delete_transaction.dart';
+import 'package:fince/features/transactions/domain/usecases/duplicate_transaction.dart';
+import 'package:fince/features/transactions/domain/usecases/update_transaction.dart';
+import 'package:fince/features/transactions/domain/usecases/watch_transactions.dart';
+import 'package:fince/features/transactions/presentation/cubit/transactions_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -30,7 +38,14 @@ class _MockAccountRepository extends Mock implements AccountRepository {}
 
 class _MockCategoryRepository extends Mock implements CategoryRepository {}
 
+class _MockTransactionRepository extends Mock implements TransactionRepository {}
+
 void main() {
+  setUpAll(() {
+    registerFallbackValue(const TransactionFilter());
+    registerFallbackValue(TransactionSort.dateDesc);
+  });
+
   testWidgets('unauthenticated start redirects to the login screen',
       (tester) async {
     final authRepo = _MockAuthRepository();
@@ -66,9 +81,29 @@ void main() {
       seedDefaultCategories: SeedDefaultCategories(categoryRepo),
     );
 
+    final transactionRepo = _MockTransactionRepository();
+    when(
+      () => transactionRepo.watchTransactions(
+        filter: any(named: 'filter'),
+        sort: any(named: 'sort'),
+      ),
+    ).thenAnswer((_) => Stream.value(const []));
+    final transactionsCubit = TransactionsCubit(
+      watchTransactions: WatchTransactions(transactionRepo),
+      createTransaction: CreateTransaction(transactionRepo),
+      updateTransaction: UpdateTransaction(transactionRepo),
+      deleteTransaction: DeleteTransaction(transactionRepo),
+      duplicateTransaction: DuplicateTransaction(transactionRepo),
+    );
+
     await tester.pumpWidget(
       FinceApp(
-        router: AppRouter(authCubit, accountsCubit, categoriesCubit).router,
+        router: AppRouter(
+          authCubit,
+          accountsCubit,
+          categoriesCubit,
+          transactionsCubit,
+        ).router,
         authCubit: authCubit,
       ),
     );

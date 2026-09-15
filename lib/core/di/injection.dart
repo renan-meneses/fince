@@ -29,6 +29,15 @@ import '../../features/categories/domain/usecases/delete_category.dart';
 import '../../features/categories/domain/usecases/seed_default_categories.dart';
 import '../../features/categories/domain/usecases/watch_categories.dart';
 import '../../features/categories/presentation/cubit/categories_cubit.dart';
+import '../../features/transactions/data/datasources/transaction_local_data_source.dart';
+import '../../features/transactions/data/repositories/transaction_repository_impl.dart';
+import '../../features/transactions/domain/repositories/transaction_repository.dart';
+import '../../features/transactions/domain/usecases/create_transaction.dart';
+import '../../features/transactions/domain/usecases/delete_transaction.dart';
+import '../../features/transactions/domain/usecases/duplicate_transaction.dart';
+import '../../features/transactions/domain/usecases/update_transaction.dart';
+import '../../features/transactions/domain/usecases/watch_transactions.dart';
+import '../../features/transactions/presentation/cubit/transactions_cubit.dart';
 import '../config/app_config.dart';
 import '../constants/storage_keys.dart';
 import '../network/dio_client.dart';
@@ -59,8 +68,14 @@ Future<void> configureDependencies(AppConfig config) async {
 
   _registerAccountsModule();
   _registerCategoriesModule();
+  _registerTransactionsModule();
   sl.registerLazySingleton<AppRouter>(
-    () => AppRouter(sl<AuthCubit>(), sl<AccountsCubit>(), sl<CategoriesCubit>()),
+    () => AppRouter(
+      sl<AuthCubit>(),
+      sl<AccountsCubit>(),
+      sl<CategoriesCubit>(),
+      sl<TransactionsCubit>(),
+    ),
   );
 }
 
@@ -138,6 +153,31 @@ void _registerCategoriesModule() {
       createCategory: sl(),
       deleteCategory: sl(),
       seedDefaultCategories: sl(),
+    ),
+  );
+}
+
+void _registerTransactionsModule() {
+  sl.registerLazySingleton<TransactionLocalDataSource>(
+    () => TransactionLocalDataSource(sl<AppDatabase>()),
+  );
+  sl.registerLazySingleton<TransactionRepository>(
+    () => TransactionRepositoryImpl(local: sl()),
+  );
+  sl.registerLazySingleton<WatchTransactions>(() => WatchTransactions(sl()));
+  sl.registerLazySingleton<CreateTransaction>(() => CreateTransaction(sl()));
+  sl.registerLazySingleton<UpdateTransaction>(() => UpdateTransaction(sl()));
+  sl.registerLazySingleton<DeleteTransaction>(() => DeleteTransaction(sl()));
+  sl.registerLazySingleton<DuplicateTransaction>(
+    () => DuplicateTransaction(sl()),
+  );
+  sl.registerLazySingleton<TransactionsCubit>(
+    () => TransactionsCubit(
+      watchTransactions: sl(),
+      createTransaction: sl(),
+      updateTransaction: sl(),
+      deleteTransaction: sl(),
+      duplicateTransaction: sl(),
     ),
   );
 }

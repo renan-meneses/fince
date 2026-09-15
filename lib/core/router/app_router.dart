@@ -12,14 +12,23 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/categories/presentation/cubit/categories_cubit.dart';
 import '../../features/categories/presentation/screens/categories_screen.dart';
+import '../../features/transactions/presentation/cubit/transactions_cubit.dart';
+import '../../features/transactions/presentation/screens/transaction_form_screen.dart';
+import '../../features/transactions/presentation/screens/transactions_screen.dart';
 
 /// Typed application router with auth redirect guards.
 class AppRouter {
-  AppRouter(this._authCubit, this._accountsCubit, this._categoriesCubit);
+  AppRouter(
+    this._authCubit,
+    this._accountsCubit,
+    this._categoriesCubit,
+    this._transactionsCubit,
+  );
 
   final AuthCubit _authCubit;
   final AccountsCubit _accountsCubit;
   final CategoriesCubit _categoriesCubit;
+  final TransactionsCubit _transactionsCubit;
 
   late final GoRouter router = GoRouter(
     initialLocation: '/',
@@ -93,6 +102,30 @@ class AppRouter {
         builder: (context, state) => BlocProvider.value(
           value: _categoriesCubit,
           child: const CategoriesScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/transactions',
+        name: 'transactions',
+        builder: (context, state) => BlocProvider.value(
+          value: _transactionsCubit,
+          child: const TransactionsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/transactions/new',
+        name: 'newTransaction',
+        builder: (context, state) => BlocProvider.value(
+          value: _transactionsCubit,
+          child: const TransactionFormScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/transactions/:id',
+        name: 'editTransaction',
+        builder: (context, state) => BlocProvider.value(
+          value: _transactionsCubit,
+          child: TransactionFormScreen(transactionId: state.pathParameters['id']),
         ),
       ),
     ],
