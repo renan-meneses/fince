@@ -1,16 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-/// Typed application router.
-///
-/// Route names mirror the feature map. Auth redirect guards will be attached
-/// once the auth module exists (task 4).
+import '../../features/auth/presentation/cubit/auth_cubit.dart';
+import '../../features/auth/presentation/screens/forgot_password_screen.dart';
+import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/register_screen.dart';
+
+/// Typed application router with auth redirect guards.
 class AppRouter {
-  AppRouter();
+  AppRouter(this._authCubit);
+
+  final AuthCubit _authCubit;
 
   late final GoRouter router = GoRouter(
     initialLocation: '/',
+    refreshListenable: _authCubit.sessionRevision,
+    redirect: (context, state) {
+      final loggedIn = _authCubit.isAuthenticated;
+      final isAuthRoute = state.matchedLocation == '/login' ||
+          state.matchedLocation == '/register' ||
+          state.matchedLocation == '/forgot-password';
+
+      if (!loggedIn && !isAuthRoute) return '/login';
+      if (loggedIn && isAuthRoute) return '/';
+      return null;
+    },
     routes: [
+      GoRoute(
+        path: '/login',
+        name: 'login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/register',
+        name: 'register',
+        builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        name: 'forgotPassword',
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
       GoRoute(
         path: '/',
         name: 'home',

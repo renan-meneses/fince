@@ -6,4 +6,5 @@ abstract final class StorageKeys {
   static const String refreshToken = 'auth.refresh_token';
   static const String biometricEnabled = 'security.biometric_enabled';
   static const String userId = 'auth.user_id';
+  static const String userProfile = 'auth.user_profile';
 }

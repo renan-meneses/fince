@@ -9,10 +9,14 @@ analyzer:
 
 linter:
   rules:
-    - always_declare_return_types
-    - avoid_print
-    - directives_ordering
-    - prefer_const_constructors
-    - prefer_final_locals
-    - prefer_single_quotes
-    - unawaited_futures
+    always_declare_return_types: true
+    avoid_print: true
+    directives_ordering: true
+    prefer_const_constructors: true
+    prefer_final_locals: true
+    # Public named params mapped to private fields are the standard DI pattern;
+    # initializing formals cannot express them (a private named param can't be
+    # passed by external callers).
+    prefer_initializing_formals: false
+    prefer_single_quotes: true
+    unawaited_futures: true
