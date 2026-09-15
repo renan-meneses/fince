@@ -42,6 +42,14 @@ import '../../features/dashboard/data/repositories/dashboard_repository_impl.dar
 import '../../features/dashboard/domain/repositories/dashboard_repository.dart';
 import '../../features/dashboard/domain/usecases/watch_overview.dart';
 import '../../features/dashboard/presentation/cubit/dashboard_cubit.dart';
+import '../../features/recurring_transactions/data/datasources/recurring_transaction_local_data_source.dart';
+import '../../features/recurring_transactions/data/repositories/recurring_transaction_repository_impl.dart';
+import '../../features/recurring_transactions/domain/repositories/recurring_transaction_repository.dart';
+import '../../features/recurring_transactions/domain/usecases/create_recurring_transaction.dart';
+import '../../features/recurring_transactions/domain/usecases/delete_recurring_transaction.dart';
+import '../../features/recurring_transactions/domain/usecases/generate_due_occurrences.dart';
+import '../../features/recurring_transactions/domain/usecases/watch_recurring_transactions.dart';
+import '../../features/recurring_transactions/presentation/cubit/recurring_cubit.dart';
 import '../../features/transactions/data/datasources/transaction_local_data_source.dart';
 import '../../features/transactions/data/repositories/transaction_repository_impl.dart';
 import '../../features/transactions/domain/repositories/transaction_repository.dart';
@@ -84,6 +92,7 @@ Future<void> configureDependencies(AppConfig config) async {
   _registerTransactionsModule();
   _registerDashboardModule();
   _registerCreditCardsModule();
+  _registerRecurringModule();
   sl.registerLazySingleton<AppRouter>(
     () => AppRouter(
       sl<AuthCubit>(),
@@ -92,6 +101,7 @@ Future<void> configureDependencies(AppConfig config) async {
       sl<TransactionsCubit>(),
       sl<DashboardCubit>(),
       sl<CreditCardsCubit>(),
+      sl<RecurringCubit>(),
     ),
   );
 }
@@ -233,5 +243,32 @@ void _registerCreditCardsModule() {
       getInvoices: sl(),
       payInvoice: sl(),
     ),
+  );
+}
+
+void _registerRecurringModule() {
+  sl.registerLazySingleton<RecurringTransactionLocalDataSource>(
+    () => RecurringTransactionLocalDataSource(
+      sl<AppDatabase>(),
+      sl<TransactionLocalDataSource>(),
+    ),
+  );
+  sl.registerLazySingleton<RecurringTransactionRepository>(
+    () => RecurringTransactionRepositoryImpl(local: sl()),
+  );
+  sl.registerLazySingleton<WatchRecurringTransactions>(
+    () => WatchRecurringTransactions(sl()),
+  );
+  sl.registerLazySingleton<CreateRecurringTransaction>(
+    () => CreateRecurringTransaction(sl()),
+  );
+  sl.registerLazySingleton<DeleteRecurringTransaction>(
+    () => DeleteRecurringTransaction(sl()),
+  );
+  sl.registerLazySingleton<GenerateDueOccurrences>(
+    () => GenerateDueOccurrences(sl()),
+  );
+  sl.registerLazySingleton<RecurringCubit>(
+    () => RecurringCubit(watch: sl(), delete: sl(), generate: sl()),
   );
 }

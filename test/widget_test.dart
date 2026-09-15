@@ -33,6 +33,11 @@ import 'package:fince/features/dashboard/domain/entities/financial_overview.dart
 import 'package:fince/features/dashboard/domain/repositories/dashboard_repository.dart';
 import 'package:fince/features/dashboard/domain/usecases/watch_overview.dart';
 import 'package:fince/features/dashboard/presentation/cubit/dashboard_cubit.dart';
+import 'package:fince/features/recurring_transactions/domain/repositories/recurring_transaction_repository.dart';
+import 'package:fince/features/recurring_transactions/domain/usecases/delete_recurring_transaction.dart';
+import 'package:fince/features/recurring_transactions/domain/usecases/generate_due_occurrences.dart';
+import 'package:fince/features/recurring_transactions/domain/usecases/watch_recurring_transactions.dart';
+import 'package:fince/features/recurring_transactions/presentation/cubit/recurring_cubit.dart';
 import 'package:fince/features/transactions/domain/entities/transaction_filter.dart';
 import 'package:fince/features/transactions/domain/repositories/transaction_repository.dart';
 import 'package:fince/features/transactions/domain/usecases/create_transaction.dart';
@@ -56,6 +61,9 @@ class _MockDashboardRepository extends Mock implements DashboardRepository {}
 
 class _MockCreditCardRepository extends Mock
     implements CreditCardRepository {}
+
+class _MockRecurringRepository extends Mock
+    implements RecurringTransactionRepository {}
 
 void main() {
   setUpAll(() {
@@ -148,6 +156,14 @@ void main() {
       payInvoice: PayInvoice(creditCardRepo),
     );
 
+    final recurringRepo = _MockRecurringRepository();
+    when(() => recurringRepo.watchAll()).thenAnswer((_) => Stream.value(const []));
+    final recurringCubit = RecurringCubit(
+      watch: WatchRecurringTransactions(recurringRepo),
+      delete: DeleteRecurringTransaction(recurringRepo),
+      generate: GenerateDueOccurrences(recurringRepo),
+    );
+
     await tester.pumpWidget(
       FinceApp(
         router: AppRouter(
@@ -157,6 +173,7 @@ void main() {
           transactionsCubit,
           dashboardCubit,
           creditCardsCubit,
+          recurringCubit,
         ).router,
         authCubit: authCubit,
       ),
