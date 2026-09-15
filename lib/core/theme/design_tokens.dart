@@ -46,3 +46,56 @@ abstract final class AppDurations {
   static const Duration fast = Duration(milliseconds: 150);
   static const Duration normal = Duration(milliseconds: 250);
 }
+
+/// Type scale. Colors are intentionally omitted so styles inherit from the
+/// active theme; only size/weight/height are fixed.
+abstract final class AppTypography {
+  static const TextStyle displayLarge =
+      TextStyle(fontSize: 40, fontWeight: FontWeight.w700, height: 1.1);
+  static const TextStyle headline =
+      TextStyle(fontSize: 24, fontWeight: FontWeight.w700, height: 1.2);
+  static const TextStyle title =
+      TextStyle(fontSize: 18, fontWeight: FontWeight.w600, height: 1.3);
+  static const TextStyle body =
+      TextStyle(fontSize: 15, fontWeight: FontWeight.w400, height: 1.4);
+  static const TextStyle bodyStrong =
+      TextStyle(fontSize: 15, fontWeight: FontWeight.w600, height: 1.4);
+  static const TextStyle label =
+      TextStyle(fontSize: 13, fontWeight: FontWeight.w500, height: 1.3);
+  static const TextStyle caption =
+      TextStyle(fontSize: 12, fontWeight: FontWeight.w400, height: 1.3);
+}
+
+abstract final class AppShadows {
+  static final List<BoxShadow> card = [
+    BoxShadow(
+      color: Colors.black.withValues(alpha: 0.05),
+      blurRadius: 16,
+      offset: const Offset(0, 4),
+    ),
+  ];
+
+  static final List<BoxShadow> overlay = [
+    BoxShadow(
+      color: Colors.black.withValues(alpha: 0.14),
+      blurRadius: 28,
+      offset: const Offset(0, 10),
+    ),
+  ];
+}
+
+/// Icon tokens so a brand/icon swap is a single change, not a screen-by-screen
+/// hunt.
+abstract final class AppIcons {
+  static const IconData income = Icons.south_west_rounded;
+  static const IconData expense = Icons.north_east_rounded;
+  static const IconData transfer = Icons.swap_horiz_rounded;
+  static const IconData account = Icons.account_balance_wallet_rounded;
+  static const IconData creditCard = Icons.credit_card_rounded;
+  static const IconData budget = Icons.pie_chart_rounded;
+  static const IconData goal = Icons.flag_rounded;
+  static const IconData report = Icons.bar_chart_rounded;
+  static const IconData insight = Icons.lightbulb_rounded;
+  static const IconData recurring = Icons.repeat_rounded;
+  static const IconData settings = Icons.settings_rounded;
+}
