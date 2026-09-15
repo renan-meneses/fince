@@ -1,5 +1,7 @@
 # Fince — Personal Finance Manager
 
+<img src="docs/assets/banner.png" alt="Fince banner" width="100%">
+
 A production-ready **Personal Finance Management** mobile application built with **Flutter**.
 Fince helps users control income, expenses, accounts, credit cards, budgets, financial goals,
 and recurring transactions through a clean, offline-first, fintech-style interface.
