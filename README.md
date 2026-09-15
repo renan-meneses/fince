@@ -4,8 +4,10 @@ A production-ready **Personal Finance Management** mobile application built with
 Fince helps users control income, expenses, accounts, credit cards, budgets, financial goals,
 and recurring transactions through a clean, offline-first, fintech-style interface.
 
-> **Status:** Architecture defined. Implementation follows the roadmap in
-> [`docs/architecture.md`](docs/architecture.md#17-implementation-roadmap).
+> **Status:** ✅ All 18 roadmap tasks implemented — Clean Architecture core, design system,
+> auth, Drift database, accounts, categories, transactions, dashboard, credit cards, recurring
+> transactions, budgets, goals, reports, insights, offline sync, tests, and documentation.
+> See the [roadmap](docs/architecture.md#17-implementation-roadmap) for per-task status.
 
 ## Highlights
 
@@ -42,6 +44,25 @@ and recurring transactions through a clean, offline-first, fintech-style interfa
 The full, justified dependency list is in
 [`docs/architecture.md`](docs/architecture.md#10-package-manifest).
 
+> **Note on `bloc_test`:** this Flutter SDK pins `test_api 0.7.11`, which forces the `test`
+> package to `1.31.0` and `analyzer <13` — incompatible with the current `drift_dev`/`build_runner`
+> codegen (which require `analyzer >=13`). Cubits/BLoCs are therefore tested with `flutter_test` +
+> `mocktail` directly (functionally equivalent to `blocTest`), and `bloc_test` is intentionally
+> omitted. See `pubspec.yaml` for the full dependency set.
+
+## Testing
+
+- **51 tests** across unit (Money, installment split), repository (transfers, transactions,
+  credit-card installments, budgets, recurring generation, dashboard, reports, sync idempotency),
+  Cubit (auth, transactions), and widget (design system, app shell) layers.
+- **Integration test** in `integration_test/app_test.dart` (run on a device/emulator).
+
+```bash
+flutter test                 # unit + widget tests
+flutter test --coverage      # with coverage report
+flutter test integration_test -d <device>   # end-to-end (device required)
+```
+
 ## Documentation
 
 | Doc | Contents |
@@ -59,7 +80,7 @@ The full, justified dependency list is in
 flutter pub get
 
 # 2. Generate code (freezed / json_serializable / drift)
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 
 # 3. Analyze & test
 flutter analyze

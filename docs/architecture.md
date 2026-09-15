@@ -377,7 +377,7 @@ Failure
 | `get_it` | Lightweight service locator for the composition root; no codegen. |
 | `go_router` | Official declarative router with auth redirect guards and typed routes. |
 | `dio` | Interceptors (auth, logging, connectivity), cancellation, timeouts — required for a clean API layer. |
-| `drift`, `drift_flutter`, `sqlite3_flutter_libs`, `path_provider`, `path` | SQLite persistence with typed queries, migrations, and atomic transactions. |
+| `drift`, `sqlite3_flutter_libs`, `path_provider`, `path` | SQLite persistence with typed queries, migrations, and atomic transactions. |
 | `flutter_secure_storage` | Hardware-backed storage for tokens/biometric secrets (never plain `shared_preferences`). |
 | `freezed`, `freezed_annotation` | Immutable entities/states with `copyWith`/equality; sealed unions for states. |
 | `json_serializable`, `json_annotation` | JSON (de)serialization for DTOs and remote payloads. |
@@ -389,9 +389,14 @@ Failure
 | `connectivity_plus` | Drives the sync queue drain on connectivity change. |
 | `firebase_core`, `firebase_crashlytics`, `firebase_messaging` | Crash monitoring and push notifications. |
 | `flutter_test` (dev) | Unit/widget tests. |
-| `bloc_test` (dev) | Cubit/BLoC tests. |
 | `mocktail` (dev) | Mocking repository ports and data sources. |
 | `integration_test` (SDK, dev) | On-device end-to-end tests. |
+
+> **`bloc_test` omission:** this Flutter SDK pins `test_api 0.7.11`, forcing `test 1.31.0`
+> (and `analyzer <13`), which conflicts with the current `drift_dev`/`build_runner` codegen
+> (`analyzer >=13`). Cubits/BLoCs are therefore tested with `flutter_test` + `mocktail` directly;
+> `blocTest` is only syntactic sugar, so no test coverage is lost. Re-add `bloc_test` when the SDK
+> and codegen toolchains realign.
 
 Deliberately **excluded**: state-management alternatives, a second DI framework, a decimal
 package (integer minor units suffice), an HTTP client wrapper on top of Dio, and charting beyond
@@ -448,7 +453,7 @@ recurring generation, and financial calculations (see `docs/domain-model.md`).
 
 ```bash
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs   # after schema/model changes
+dart run build_runner build   # after schema/model changes
 flutter analyze
 flutter test
 flutter run
@@ -460,7 +465,8 @@ macOS/Xcode signing).
 ## 16. Implementation roadmap
 
 Work proceeds in the order of section 27 of the specification. Each task is independently
-testable and lands as its own commit.
+testable and lands as its own commit. **Status: all 18 tasks complete** (one commit each; see
+`git log`).
 
 | # | Task | Commit scope | Verification |
 | --- | --- | --- | --- |
