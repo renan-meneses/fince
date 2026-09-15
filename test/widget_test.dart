@@ -22,6 +22,13 @@ import 'package:fince/features/categories/domain/usecases/delete_category.dart';
 import 'package:fince/features/categories/domain/usecases/seed_default_categories.dart';
 import 'package:fince/features/categories/domain/usecases/watch_categories.dart';
 import 'package:fince/features/categories/presentation/cubit/categories_cubit.dart';
+import 'package:fince/features/credit_cards/domain/repositories/credit_card_repository.dart';
+import 'package:fince/features/credit_cards/domain/usecases/create_card.dart';
+import 'package:fince/features/credit_cards/domain/usecases/get_invoices.dart';
+import 'package:fince/features/credit_cards/domain/usecases/pay_invoice.dart';
+import 'package:fince/features/credit_cards/domain/usecases/register_purchase.dart';
+import 'package:fince/features/credit_cards/domain/usecases/watch_cards.dart';
+import 'package:fince/features/credit_cards/presentation/cubit/credit_cards_cubit.dart';
 import 'package:fince/features/dashboard/domain/entities/financial_overview.dart';
 import 'package:fince/features/dashboard/domain/repositories/dashboard_repository.dart';
 import 'package:fince/features/dashboard/domain/usecases/watch_overview.dart';
@@ -46,6 +53,9 @@ class _MockCategoryRepository extends Mock implements CategoryRepository {}
 class _MockTransactionRepository extends Mock implements TransactionRepository {}
 
 class _MockDashboardRepository extends Mock implements DashboardRepository {}
+
+class _MockCreditCardRepository extends Mock
+    implements CreditCardRepository {}
 
 void main() {
   setUpAll(() {
@@ -127,6 +137,17 @@ void main() {
       watchOverview: WatchOverview(dashboardRepo),
     );
 
+    final creditCardRepo = _MockCreditCardRepository();
+    when(() => creditCardRepo.watchCards())
+        .thenAnswer((_) => Stream.value(const []));
+    final creditCardsCubit = CreditCardsCubit(
+      watchCards: WatchCards(creditCardRepo),
+      createCard: CreateCard(creditCardRepo),
+      registerPurchase: RegisterPurchase(creditCardRepo),
+      getInvoices: GetInvoices(creditCardRepo),
+      payInvoice: PayInvoice(creditCardRepo),
+    );
+
     await tester.pumpWidget(
       FinceApp(
         router: AppRouter(
@@ -135,6 +156,7 @@ void main() {
           categoriesCubit,
           transactionsCubit,
           dashboardCubit,
+          creditCardsCubit,
         ).router,
         authCubit: authCubit,
       ),

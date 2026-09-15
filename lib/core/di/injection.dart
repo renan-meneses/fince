@@ -29,6 +29,15 @@ import '../../features/categories/domain/usecases/delete_category.dart';
 import '../../features/categories/domain/usecases/seed_default_categories.dart';
 import '../../features/categories/domain/usecases/watch_categories.dart';
 import '../../features/categories/presentation/cubit/categories_cubit.dart';
+import '../../features/credit_cards/data/datasources/credit_card_local_data_source.dart';
+import '../../features/credit_cards/data/repositories/credit_card_repository_impl.dart';
+import '../../features/credit_cards/domain/repositories/credit_card_repository.dart';
+import '../../features/credit_cards/domain/usecases/create_card.dart';
+import '../../features/credit_cards/domain/usecases/get_invoices.dart';
+import '../../features/credit_cards/domain/usecases/pay_invoice.dart';
+import '../../features/credit_cards/domain/usecases/register_purchase.dart';
+import '../../features/credit_cards/domain/usecases/watch_cards.dart';
+import '../../features/credit_cards/presentation/cubit/credit_cards_cubit.dart';
 import '../../features/dashboard/data/repositories/dashboard_repository_impl.dart';
 import '../../features/dashboard/domain/repositories/dashboard_repository.dart';
 import '../../features/dashboard/domain/usecases/watch_overview.dart';
@@ -74,6 +83,7 @@ Future<void> configureDependencies(AppConfig config) async {
   _registerCategoriesModule();
   _registerTransactionsModule();
   _registerDashboardModule();
+  _registerCreditCardsModule();
   sl.registerLazySingleton<AppRouter>(
     () => AppRouter(
       sl<AuthCubit>(),
@@ -81,6 +91,7 @@ Future<void> configureDependencies(AppConfig config) async {
       sl<CategoriesCubit>(),
       sl<TransactionsCubit>(),
       sl<DashboardCubit>(),
+      sl<CreditCardsCubit>(),
     ),
   );
 }
@@ -199,5 +210,28 @@ void _registerDashboardModule() {
   sl.registerLazySingleton<WatchOverview>(() => WatchOverview(sl()));
   sl.registerLazySingleton<DashboardCubit>(
     () => DashboardCubit(watchOverview: sl()),
+  );
+}
+
+void _registerCreditCardsModule() {
+  sl.registerLazySingleton<CreditCardLocalDataSource>(
+    () => CreditCardLocalDataSource(sl<AppDatabase>()),
+  );
+  sl.registerLazySingleton<CreditCardRepository>(
+    () => CreditCardRepositoryImpl(local: sl()),
+  );
+  sl.registerLazySingleton<WatchCards>(() => WatchCards(sl()));
+  sl.registerLazySingleton<CreateCard>(() => CreateCard(sl()));
+  sl.registerLazySingleton<RegisterPurchase>(() => RegisterPurchase(sl()));
+  sl.registerLazySingleton<GetInvoices>(() => GetInvoices(sl()));
+  sl.registerLazySingleton<PayInvoice>(() => PayInvoice(sl()));
+  sl.registerLazySingleton<CreditCardsCubit>(
+    () => CreditCardsCubit(
+      watchCards: sl(),
+      createCard: sl(),
+      registerPurchase: sl(),
+      getInvoices: sl(),
+      payInvoice: sl(),
+    ),
   );
 }

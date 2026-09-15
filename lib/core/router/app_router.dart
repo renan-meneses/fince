@@ -11,6 +11,10 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/categories/presentation/cubit/categories_cubit.dart';
 import '../../features/categories/presentation/screens/categories_screen.dart';
+import '../../features/credit_cards/presentation/cubit/credit_cards_cubit.dart';
+import '../../features/credit_cards/presentation/screens/credit_card_form_screen.dart';
+import '../../features/credit_cards/presentation/screens/credit_cards_screen.dart';
+import '../../features/credit_cards/presentation/screens/purchase_screen.dart';
 import '../../features/dashboard/presentation/cubit/dashboard_cubit.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/transactions/presentation/cubit/transactions_cubit.dart';
@@ -25,6 +29,7 @@ class AppRouter {
     this._categoriesCubit,
     this._transactionsCubit,
     this._dashboardCubit,
+    this._creditCardsCubit,
   );
 
   final AuthCubit _authCubit;
@@ -32,6 +37,7 @@ class AppRouter {
   final CategoriesCubit _categoriesCubit;
   final TransactionsCubit _transactionsCubit;
   final DashboardCubit _dashboardCubit;
+  final CreditCardsCubit _creditCardsCubit;
 
   late final GoRouter router = GoRouter(
     initialLocation: '/',
@@ -132,6 +138,30 @@ class AppRouter {
         builder: (context, state) => BlocProvider.value(
           value: _transactionsCubit,
           child: TransactionFormScreen(transactionId: state.pathParameters['id']),
+        ),
+      ),
+      GoRoute(
+        path: '/credit-cards',
+        name: 'creditCards',
+        builder: (context, state) => BlocProvider.value(
+          value: _creditCardsCubit,
+          child: const CreditCardsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/credit-cards/new',
+        name: 'newCreditCard',
+        builder: (context, state) => BlocProvider.value(
+          value: _creditCardsCubit,
+          child: const CreditCardFormScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/credit-cards/:id/purchase',
+        name: 'purchase',
+        builder: (context, state) => BlocProvider.value(
+          value: _creditCardsCubit,
+          child: PurchaseScreen(cardId: state.pathParameters['id']!),
         ),
       ),
     ],
