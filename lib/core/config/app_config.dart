@@ -10,6 +10,7 @@ class AppConfig {
     required this.baseUrl,
     this.enableCrashlytics = false,
     this.enablePushNotifications = false,
+    this.demoMode = false,
   });
 
   final AppEnvironment environment;
@@ -20,8 +21,17 @@ class AppConfig {
   final bool enableCrashlytics;
   final bool enablePushNotifications;
 
+  /// Uses [DemoAuthRepository] and seeds the local DB with sample data.
+  final bool demoMode;
+
   bool get isProduction => environment == AppEnvironment.production;
   bool get isDevelopment => environment == AppEnvironment.development;
+
+  factory AppConfig.demo() => const AppConfig(
+        environment: AppEnvironment.development,
+        baseUrl: 'https://demo-api.fince.app/v1',
+        demoMode: true,
+      );
 
   factory AppConfig.development() => const AppConfig(
         environment: AppEnvironment.development,

@@ -90,6 +90,18 @@ flutter test
 flutter run
 ```
 
+## Demo mode
+
+Run the app with pre-seeded sample data and a mock login (no backend needed):
+
+```bash
+flutter run -t lib/main_demo.dart
+```
+
+Log in with **email:** `demo@fince.app` · **password:** `demo123`. The demo database is
+seeded with 3 accounts, 15 categories, 13 transactions (income/expenses/transfer), a credit
+card with a 6-installment purchase, 3 budgets, 2 goals, and 3 recurring transactions.
+
 Build instructions (Android/iOS) are in
 [`docs/architecture.md`](docs/architecture.md#16-testing-strategy).
 

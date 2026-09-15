@@ -6,13 +6,12 @@ import 'core/di/injection.dart';
 import 'core/router/app_router.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
 
+/// Demo entrypoint. Seeded with sample data; log in with:
+///   email: demo@fince.app
+///   senha: demo123
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // TODO(observability): initialize Firebase (Crashlytics/Messaging) here,
-  await configureDependencies(AppConfig.development());
-
+  await configureDependencies(AppConfig.demo());
   await sl<AuthCubit>().init();
-
   runApp(FinceApp(router: sl<AppRouter>().router, authCubit: sl<AuthCubit>()));
 }

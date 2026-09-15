@@ -13,6 +13,7 @@ import '../../features/accounts/presentation/cubit/accounts_cubit.dart';
 import '../../features/auth/data/datasources/auth_local_data_source.dart';
 import '../../features/auth/data/datasources/auth_remote_data_source.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
+import '../../features/auth/data/repositories/demo_auth_repository.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/authenticate_with_biometrics.dart';
 import '../../features/auth/domain/usecases/forgot_password.dart';
@@ -95,6 +96,7 @@ import '../../features/transactions/domain/usecases/watch_transactions.dart';
 import '../../features/transactions/presentation/cubit/transactions_cubit.dart';
 import '../config/app_config.dart';
 import '../constants/storage_keys.dart';
+import '../demo/demo_data_seeder.dart';
 import '../network/dio_client.dart';
 import '../router/app_router.dart';
 import '../storage/app_database.dart';
@@ -116,10 +118,14 @@ Future<void> configureDependencies(AppConfig config) async {
     ),
   );
 
-  _registerAuthModule();
+  _registerAuthModule(demoMode: config.demoMode);
 
   final database = await openAppDatabase();
   sl.registerLazySingleton<AppDatabase>(() => database);
+
+  if (config.demoMode) {
+    await DemoDataSeeder().seed(database);
+  }
 
   _registerAccountsModule();
   _registerCategoriesModule();
@@ -149,16 +155,22 @@ Future<void> configureDependencies(AppConfig config) async {
   );
 }
 
-void _registerAuthModule() {
-  sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSource(sl<Dio>()),
-  );
+void _registerAuthModule({required bool demoMode}) {
   sl.registerLazySingleton<AuthLocalDataSource>(
     () => AuthLocalDataSource(sl<SecureStorage>()),
   );
-  sl.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(remote: sl(), local: sl()),
-  );
+  if (demoMode) {
+    sl.registerLazySingleton<AuthRepository>(
+      () => DemoAuthRepository(local: sl()),
+    );
+  } else {
+    sl.registerLazySingleton<AuthRemoteDataSource>(
+      () => AuthRemoteDataSource(sl<Dio>()),
+    );
+    sl.registerLazySingleton<AuthRepository>(
+      () => AuthRepositoryImpl(remote: sl(), local: sl()),
+    );
+  }
   sl.registerLazySingleton<Login>(() => Login(sl()));
   sl.registerLazySingleton<Register>(() => Register(sl()));
   sl.registerLazySingleton<Logout>(() => Logout(sl()));
