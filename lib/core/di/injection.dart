@@ -16,6 +16,8 @@ import '../config/app_config.dart';
 import '../constants/storage_keys.dart';
 import '../network/dio_client.dart';
 import '../router/app_router.dart';
+import '../storage/app_database.dart';
+import '../storage/database_connection.dart';
 import '../storage/secure_storage.dart';
 
 /// Composition root. All concrete implementations are registered here and
@@ -34,6 +36,10 @@ Future<void> configureDependencies(AppConfig config) async {
   );
 
   _registerAuthModule();
+
+  final database = await openAppDatabase();
+  sl.registerLazySingleton<AppDatabase>(() => database);
+
   sl.registerLazySingleton<AppRouter>(() => AppRouter(sl<AuthCubit>()));
 }
 
