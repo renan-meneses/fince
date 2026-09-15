@@ -10,13 +10,16 @@ import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
+import '../../features/categories/presentation/cubit/categories_cubit.dart';
+import '../../features/categories/presentation/screens/categories_screen.dart';
 
 /// Typed application router with auth redirect guards.
 class AppRouter {
-  AppRouter(this._authCubit, this._accountsCubit);
+  AppRouter(this._authCubit, this._accountsCubit, this._categoriesCubit);
 
   final AuthCubit _authCubit;
   final AccountsCubit _accountsCubit;
+  final CategoriesCubit _categoriesCubit;
 
   late final GoRouter router = GoRouter(
     initialLocation: '/',
@@ -82,6 +85,14 @@ class AppRouter {
         builder: (context, state) => BlocProvider.value(
           value: _accountsCubit,
           child: AccountFormScreen(accountId: state.pathParameters['id']),
+        ),
+      ),
+      GoRoute(
+        path: '/categories',
+        name: 'categories',
+        builder: (context, state) => BlocProvider.value(
+          value: _categoriesCubit,
+          child: const CategoriesScreen(),
         ),
       ),
     ],

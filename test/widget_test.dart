@@ -15,12 +15,20 @@ import 'package:fince/features/auth/domain/usecases/login.dart';
 import 'package:fince/features/auth/domain/usecases/logout.dart';
 import 'package:fince/features/auth/domain/usecases/register.dart';
 import 'package:fince/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:fince/features/categories/domain/repositories/category_repository.dart';
+import 'package:fince/features/categories/domain/usecases/create_category.dart';
+import 'package:fince/features/categories/domain/usecases/delete_category.dart';
+import 'package:fince/features/categories/domain/usecases/seed_default_categories.dart';
+import 'package:fince/features/categories/domain/usecases/watch_categories.dart';
+import 'package:fince/features/categories/presentation/cubit/categories_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _MockAuthRepository extends Mock implements AuthRepository {}
 
 class _MockAccountRepository extends Mock implements AccountRepository {}
+
+class _MockCategoryRepository extends Mock implements CategoryRepository {}
 
 void main() {
   testWidgets('unauthenticated start redirects to the login screen',
@@ -47,9 +55,20 @@ void main() {
       transferBetweenAccounts: TransferBetweenAccounts(accountRepo),
     );
 
+    final categoryRepo = _MockCategoryRepository();
+    when(() => categoryRepo.watchCategories())
+        .thenAnswer((_) => Stream.value(const []));
+    when(() => categoryRepo.seedDefaultCategories()).thenAnswer((_) async {});
+    final categoriesCubit = CategoriesCubit(
+      watchCategories: WatchCategories(categoryRepo),
+      createCategory: CreateCategory(categoryRepo),
+      deleteCategory: DeleteCategory(categoryRepo),
+      seedDefaultCategories: SeedDefaultCategories(categoryRepo),
+    );
+
     await tester.pumpWidget(
       FinceApp(
-        router: AppRouter(authCubit, accountsCubit).router,
+        router: AppRouter(authCubit, accountsCubit, categoriesCubit).router,
         authCubit: authCubit,
       ),
     );

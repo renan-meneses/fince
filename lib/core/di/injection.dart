@@ -21,6 +21,14 @@ import '../../features/auth/domain/usecases/login.dart';
 import '../../features/auth/domain/usecases/logout.dart';
 import '../../features/auth/domain/usecases/register.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
+import '../../features/categories/data/datasources/category_local_data_source.dart';
+import '../../features/categories/data/repositories/category_repository_impl.dart';
+import '../../features/categories/domain/repositories/category_repository.dart';
+import '../../features/categories/domain/usecases/create_category.dart';
+import '../../features/categories/domain/usecases/delete_category.dart';
+import '../../features/categories/domain/usecases/seed_default_categories.dart';
+import '../../features/categories/domain/usecases/watch_categories.dart';
+import '../../features/categories/presentation/cubit/categories_cubit.dart';
 import '../config/app_config.dart';
 import '../constants/storage_keys.dart';
 import '../network/dio_client.dart';
@@ -50,8 +58,9 @@ Future<void> configureDependencies(AppConfig config) async {
   sl.registerLazySingleton<AppDatabase>(() => database);
 
   _registerAccountsModule();
+  _registerCategoriesModule();
   sl.registerLazySingleton<AppRouter>(
-    () => AppRouter(sl<AuthCubit>(), sl<AccountsCubit>()),
+    () => AppRouter(sl<AuthCubit>(), sl<AccountsCubit>(), sl<CategoriesCubit>()),
   );
 }
 
@@ -106,6 +115,29 @@ void _registerAccountsModule() {
       updateAccount: sl(),
       archiveAccount: sl(),
       transferBetweenAccounts: sl(),
+    ),
+  );
+}
+
+void _registerCategoriesModule() {
+  sl.registerLazySingleton<CategoryLocalDataSource>(
+    () => CategoryLocalDataSource(sl<AppDatabase>()),
+  );
+  sl.registerLazySingleton<CategoryRepository>(
+    () => CategoryRepositoryImpl(local: sl()),
+  );
+  sl.registerLazySingleton<WatchCategories>(() => WatchCategories(sl()));
+  sl.registerLazySingleton<CreateCategory>(() => CreateCategory(sl()));
+  sl.registerLazySingleton<DeleteCategory>(() => DeleteCategory(sl()));
+  sl.registerLazySingleton<SeedDefaultCategories>(
+    () => SeedDefaultCategories(sl()),
+  );
+  sl.registerLazySingleton<CategoriesCubit>(
+    () => CategoriesCubit(
+      watchCategories: sl(),
+      createCategory: sl(),
+      deleteCategory: sl(),
+      seedDefaultCategories: sl(),
     ),
   );
 }

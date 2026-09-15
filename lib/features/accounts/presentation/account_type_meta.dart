@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../domain/entities/account.dart';
 
+export '../../../../core/utils/color_utils.dart';
+
 /// Presentation metadata for account types (labels, icons, default colors).
 String accountTypeLabel(AccountType type) => switch (type) {
       AccountType.checking => 'Conta corrente',
@@ -65,13 +67,3 @@ String accountIconName(IconData icon) => _accountIconMap.entries
       orElse: () => const MapEntry('wallet', Icons.account_balance_wallet_rounded),
     )
     .key;
-
-/// Parses a `#RRGGBB` string into a [Color], defaulting safely.
-Color colorFromHex(String hex) {
-  final value = int.tryParse(hex.replaceFirst('#', ''), radix: 16);
-  return value == null ? const Color(0xFF0B6E4F) : Color(0xFF000000 | value);
-}
-
-/// Serializes a [Color] to a `#RRGGBB` string.
-String colorToHex(Color color) =>
-    '#${(color.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
