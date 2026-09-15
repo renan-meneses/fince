@@ -19,6 +19,8 @@ import '../../features/credit_cards/presentation/screens/credit_cards_screen.dar
 import '../../features/credit_cards/presentation/screens/purchase_screen.dart';
 import '../../features/dashboard/presentation/cubit/dashboard_cubit.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
+import '../../features/goals/presentation/cubit/goals_cubit.dart';
+import '../../features/goals/presentation/screens/goals_screen.dart';
 import '../../features/recurring_transactions/presentation/cubit/recurring_cubit.dart';
 import '../../features/recurring_transactions/presentation/screens/recurring_screen.dart';
 import '../../features/transactions/presentation/cubit/transactions_cubit.dart';
@@ -36,6 +38,7 @@ class AppRouter {
     this._creditCardsCubit,
     this._recurringCubit,
     this._budgetsCubit,
+    this._goalsCubit,
   );
 
   final AuthCubit _authCubit;
@@ -46,6 +49,7 @@ class AppRouter {
   final CreditCardsCubit _creditCardsCubit;
   final RecurringCubit _recurringCubit;
   final BudgetsCubit _budgetsCubit;
+  final GoalsCubit _goalsCubit;
 
   late final GoRouter router = GoRouter(
     initialLocation: '/',
@@ -186,6 +190,14 @@ class AppRouter {
         builder: (context, state) => BlocProvider.value(
           value: _budgetsCubit,
           child: const BudgetsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/goals',
+        name: 'goals',
+        builder: (context, state) => BlocProvider.value(
+          value: _goalsCubit,
+          child: const GoalsScreen(),
         ),
       ),
     ],

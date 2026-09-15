@@ -49,6 +49,14 @@ import '../../features/dashboard/data/repositories/dashboard_repository_impl.dar
 import '../../features/dashboard/domain/repositories/dashboard_repository.dart';
 import '../../features/dashboard/domain/usecases/watch_overview.dart';
 import '../../features/dashboard/presentation/cubit/dashboard_cubit.dart';
+import '../../features/goals/data/datasources/goal_local_data_source.dart';
+import '../../features/goals/data/repositories/goal_repository_impl.dart';
+import '../../features/goals/domain/repositories/goal_repository.dart';
+import '../../features/goals/domain/usecases/create_goal.dart';
+import '../../features/goals/domain/usecases/delete_goal.dart';
+import '../../features/goals/domain/usecases/deposit_to_goal.dart';
+import '../../features/goals/domain/usecases/watch_goals.dart';
+import '../../features/goals/presentation/cubit/goals_cubit.dart';
 import '../../features/recurring_transactions/data/datasources/recurring_transaction_local_data_source.dart';
 import '../../features/recurring_transactions/data/repositories/recurring_transaction_repository_impl.dart';
 import '../../features/recurring_transactions/domain/repositories/recurring_transaction_repository.dart';
@@ -101,6 +109,7 @@ Future<void> configureDependencies(AppConfig config) async {
   _registerCreditCardsModule();
   _registerRecurringModule();
   _registerBudgetsModule();
+  _registerGoalsModule();
   sl.registerLazySingleton<AppRouter>(
     () => AppRouter(
       sl<AuthCubit>(),
@@ -111,6 +120,7 @@ Future<void> configureDependencies(AppConfig config) async {
       sl<CreditCardsCubit>(),
       sl<RecurringCubit>(),
       sl<BudgetsCubit>(),
+      sl<GoalsCubit>(),
     ),
   );
 }
@@ -301,6 +311,25 @@ void _registerBudgetsModule() {
       watchBudgets: sl(),
       createBudget: sl(),
       deleteBudget: sl(),
+    ),
+  );
+}
+
+void _registerGoalsModule() {
+  sl.registerLazySingleton<GoalLocalDataSource>(
+    () => GoalLocalDataSource(sl<AppDatabase>()),
+  );
+  sl.registerLazySingleton<GoalRepository>(() => GoalRepositoryImpl(local: sl()));
+  sl.registerLazySingleton<WatchGoals>(() => WatchGoals(sl()));
+  sl.registerLazySingleton<CreateGoal>(() => CreateGoal(sl()));
+  sl.registerLazySingleton<DeleteGoal>(() => DeleteGoal(sl()));
+  sl.registerLazySingleton<DepositToGoal>(() => DepositToGoal(sl()));
+  sl.registerLazySingleton<GoalsCubit>(
+    () => GoalsCubit(
+      watchGoals: sl(),
+      createGoal: sl(),
+      deleteGoal: sl(),
+      depositToGoal: sl(),
     ),
   );
 }

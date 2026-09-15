@@ -38,6 +38,12 @@ import 'package:fince/features/dashboard/domain/entities/financial_overview.dart
 import 'package:fince/features/dashboard/domain/repositories/dashboard_repository.dart';
 import 'package:fince/features/dashboard/domain/usecases/watch_overview.dart';
 import 'package:fince/features/dashboard/presentation/cubit/dashboard_cubit.dart';
+import 'package:fince/features/goals/domain/repositories/goal_repository.dart';
+import 'package:fince/features/goals/domain/usecases/create_goal.dart';
+import 'package:fince/features/goals/domain/usecases/delete_goal.dart';
+import 'package:fince/features/goals/domain/usecases/deposit_to_goal.dart';
+import 'package:fince/features/goals/domain/usecases/watch_goals.dart';
+import 'package:fince/features/goals/presentation/cubit/goals_cubit.dart';
 import 'package:fince/features/recurring_transactions/domain/repositories/recurring_transaction_repository.dart';
 import 'package:fince/features/recurring_transactions/domain/usecases/delete_recurring_transaction.dart';
 import 'package:fince/features/recurring_transactions/domain/usecases/generate_due_occurrences.dart';
@@ -71,6 +77,8 @@ class _MockRecurringRepository extends Mock
     implements RecurringTransactionRepository {}
 
 class _MockBudgetRepository extends Mock implements BudgetRepository {}
+
+class _MockGoalRepository extends Mock implements GoalRepository {}
 
 void main() {
   setUpAll(() {
@@ -180,6 +188,15 @@ void main() {
       deleteBudget: DeleteBudget(budgetRepo),
     );
 
+    final goalRepo = _MockGoalRepository();
+    when(() => goalRepo.watchGoals()).thenAnswer((_) => Stream.value(const []));
+    final goalsCubit = GoalsCubit(
+      watchGoals: WatchGoals(goalRepo),
+      createGoal: CreateGoal(goalRepo),
+      deleteGoal: DeleteGoal(goalRepo),
+      depositToGoal: DepositToGoal(goalRepo),
+    );
+
     await tester.pumpWidget(
       FinceApp(
         router: AppRouter(
@@ -191,6 +208,7 @@ void main() {
           creditCardsCubit,
           recurringCubit,
           budgetsCubit,
+          goalsCubit,
         ).router,
         authCubit: authCubit,
       ),
