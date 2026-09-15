@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,6 +11,8 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/categories/presentation/cubit/categories_cubit.dart';
 import '../../features/categories/presentation/screens/categories_screen.dart';
+import '../../features/dashboard/presentation/cubit/dashboard_cubit.dart';
+import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/transactions/presentation/cubit/transactions_cubit.dart';
 import '../../features/transactions/presentation/screens/transaction_form_screen.dart';
 import '../../features/transactions/presentation/screens/transactions_screen.dart';
@@ -23,12 +24,14 @@ class AppRouter {
     this._accountsCubit,
     this._categoriesCubit,
     this._transactionsCubit,
+    this._dashboardCubit,
   );
 
   final AuthCubit _authCubit;
   final AccountsCubit _accountsCubit;
   final CategoriesCubit _categoriesCubit;
   final TransactionsCubit _transactionsCubit;
+  final DashboardCubit _dashboardCubit;
 
   late final GoRouter router = GoRouter(
     initialLocation: '/',
@@ -62,7 +65,10 @@ class AppRouter {
       GoRoute(
         path: '/',
         name: 'home',
-        builder: (context, state) => const _HomePlaceholder(),
+        builder: (context, state) => BlocProvider.value(
+          value: _dashboardCubit,
+          child: const DashboardScreen(),
+        ),
       ),
       GoRoute(
         path: '/accounts',
@@ -130,29 +136,4 @@ class AppRouter {
       ),
     ],
   );
-}
-
-/// Temporary bootstrap screen, replaced by the real dashboard in task 9.
-class _HomePlaceholder extends StatelessWidget {
-  const _HomePlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Fince')),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Dashboard em breve'),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: () => context.go('/accounts'),
-              child: const Text('Ver contas'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

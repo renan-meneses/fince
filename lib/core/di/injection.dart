@@ -29,6 +29,10 @@ import '../../features/categories/domain/usecases/delete_category.dart';
 import '../../features/categories/domain/usecases/seed_default_categories.dart';
 import '../../features/categories/domain/usecases/watch_categories.dart';
 import '../../features/categories/presentation/cubit/categories_cubit.dart';
+import '../../features/dashboard/data/repositories/dashboard_repository_impl.dart';
+import '../../features/dashboard/domain/repositories/dashboard_repository.dart';
+import '../../features/dashboard/domain/usecases/watch_overview.dart';
+import '../../features/dashboard/presentation/cubit/dashboard_cubit.dart';
 import '../../features/transactions/data/datasources/transaction_local_data_source.dart';
 import '../../features/transactions/data/repositories/transaction_repository_impl.dart';
 import '../../features/transactions/domain/repositories/transaction_repository.dart';
@@ -69,12 +73,14 @@ Future<void> configureDependencies(AppConfig config) async {
   _registerAccountsModule();
   _registerCategoriesModule();
   _registerTransactionsModule();
+  _registerDashboardModule();
   sl.registerLazySingleton<AppRouter>(
     () => AppRouter(
       sl<AuthCubit>(),
       sl<AccountsCubit>(),
       sl<CategoriesCubit>(),
       sl<TransactionsCubit>(),
+      sl<DashboardCubit>(),
     ),
   );
 }
@@ -179,5 +185,19 @@ void _registerTransactionsModule() {
       deleteTransaction: sl(),
       duplicateTransaction: sl(),
     ),
+  );
+}
+
+void _registerDashboardModule() {
+  sl.registerLazySingleton<DashboardRepository>(
+    () => DashboardRepositoryImpl(
+      accounts: sl(),
+      transactions: sl(),
+      categories: sl(),
+    ),
+  );
+  sl.registerLazySingleton<WatchOverview>(() => WatchOverview(sl()));
+  sl.registerLazySingleton<DashboardCubit>(
+    () => DashboardCubit(watchOverview: sl()),
   );
 }

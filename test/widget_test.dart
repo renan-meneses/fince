@@ -1,4 +1,5 @@
 import 'package:fince/app.dart';
+import 'package:fince/core/domain/money.dart';
 import 'package:fince/core/router/app_router.dart';
 import 'package:fince/features/accounts/domain/repositories/account_repository.dart';
 import 'package:fince/features/accounts/domain/usecases/archive_account.dart';
@@ -21,6 +22,10 @@ import 'package:fince/features/categories/domain/usecases/delete_category.dart';
 import 'package:fince/features/categories/domain/usecases/seed_default_categories.dart';
 import 'package:fince/features/categories/domain/usecases/watch_categories.dart';
 import 'package:fince/features/categories/presentation/cubit/categories_cubit.dart';
+import 'package:fince/features/dashboard/domain/entities/financial_overview.dart';
+import 'package:fince/features/dashboard/domain/repositories/dashboard_repository.dart';
+import 'package:fince/features/dashboard/domain/usecases/watch_overview.dart';
+import 'package:fince/features/dashboard/presentation/cubit/dashboard_cubit.dart';
 import 'package:fince/features/transactions/domain/entities/transaction_filter.dart';
 import 'package:fince/features/transactions/domain/repositories/transaction_repository.dart';
 import 'package:fince/features/transactions/domain/usecases/create_transaction.dart';
@@ -40,10 +45,13 @@ class _MockCategoryRepository extends Mock implements CategoryRepository {}
 
 class _MockTransactionRepository extends Mock implements TransactionRepository {}
 
+class _MockDashboardRepository extends Mock implements DashboardRepository {}
+
 void main() {
   setUpAll(() {
     registerFallbackValue(const TransactionFilter());
     registerFallbackValue(TransactionSort.dateDesc);
+    registerFallbackValue(DateTime(2000));
   });
 
   testWidgets('unauthenticated start redirects to the login screen',
@@ -96,6 +104,29 @@ void main() {
       duplicateTransaction: DuplicateTransaction(transactionRepo),
     );
 
+    final dashboardRepo = _MockDashboardRepository();
+    when(
+      () => dashboardRepo.watchOverview(
+        start: any(named: 'start'),
+        end: any(named: 'end'),
+      ),
+    ).thenAnswer(
+      (_) => Stream.value(
+        FinancialOverview(
+          totalBalance: Money(0, 'BRL'),
+          income: Money(0, 'BRL'),
+          expenses: Money(0, 'BRL'),
+          result: Money(0, 'BRL'),
+          variationPercent: null,
+          recentTransactions: const [],
+          expensesByCategory: const [],
+        ),
+      ),
+    );
+    final dashboardCubit = DashboardCubit(
+      watchOverview: WatchOverview(dashboardRepo),
+    );
+
     await tester.pumpWidget(
       FinceApp(
         router: AppRouter(
@@ -103,6 +134,7 @@ void main() {
           accountsCubit,
           categoriesCubit,
           transactionsCubit,
+          dashboardCubit,
         ).router,
         authCubit: authCubit,
       ),
