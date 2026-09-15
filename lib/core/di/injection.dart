@@ -65,6 +65,13 @@ import '../../features/recurring_transactions/domain/usecases/delete_recurring_t
 import '../../features/recurring_transactions/domain/usecases/generate_due_occurrences.dart';
 import '../../features/recurring_transactions/domain/usecases/watch_recurring_transactions.dart';
 import '../../features/recurring_transactions/presentation/cubit/recurring_cubit.dart';
+import '../../features/reports/data/repositories/report_repository_impl.dart';
+import '../../features/reports/domain/repositories/report_repository.dart';
+import '../../features/reports/domain/usecases/get_cash_flow.dart';
+import '../../features/reports/domain/usecases/get_expenses_by_account.dart';
+import '../../features/reports/domain/usecases/get_expenses_by_category.dart';
+import '../../features/reports/domain/usecases/get_income_vs_expense.dart';
+import '../../features/reports/presentation/cubit/reports_cubit.dart';
 import '../../features/transactions/data/datasources/transaction_local_data_source.dart';
 import '../../features/transactions/data/repositories/transaction_repository_impl.dart';
 import '../../features/transactions/domain/repositories/transaction_repository.dart';
@@ -110,6 +117,7 @@ Future<void> configureDependencies(AppConfig config) async {
   _registerRecurringModule();
   _registerBudgetsModule();
   _registerGoalsModule();
+  _registerReportsModule();
   sl.registerLazySingleton<AppRouter>(
     () => AppRouter(
       sl<AuthCubit>(),
@@ -121,6 +129,7 @@ Future<void> configureDependencies(AppConfig config) async {
       sl<RecurringCubit>(),
       sl<BudgetsCubit>(),
       sl<GoalsCubit>(),
+      sl<ReportsCubit>(),
     ),
   );
 }
@@ -330,6 +339,32 @@ void _registerGoalsModule() {
       createGoal: sl(),
       deleteGoal: sl(),
       depositToGoal: sl(),
+    ),
+  );
+}
+
+void _registerReportsModule() {
+  sl.registerLazySingleton<ReportRepository>(
+    () => ReportRepositoryImpl(
+      transactions: sl(),
+      categories: sl(),
+      accounts: sl(),
+    ),
+  );
+  sl.registerLazySingleton<GetIncomeVsExpense>(() => GetIncomeVsExpense(sl()));
+  sl.registerLazySingleton<GetCashFlow>(() => GetCashFlow(sl()));
+  sl.registerLazySingleton<GetExpensesByCategory>(
+    () => GetExpensesByCategory(sl()),
+  );
+  sl.registerLazySingleton<GetExpensesByAccount>(
+    () => GetExpensesByAccount(sl()),
+  );
+  sl.registerLazySingleton<ReportsCubit>(
+    () => ReportsCubit(
+      incomeVsExpense: sl(),
+      cashFlow: sl(),
+      byCategory: sl(),
+      byAccount: sl(),
     ),
   );
 }

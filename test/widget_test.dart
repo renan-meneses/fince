@@ -49,6 +49,13 @@ import 'package:fince/features/recurring_transactions/domain/usecases/delete_rec
 import 'package:fince/features/recurring_transactions/domain/usecases/generate_due_occurrences.dart';
 import 'package:fince/features/recurring_transactions/domain/usecases/watch_recurring_transactions.dart';
 import 'package:fince/features/recurring_transactions/presentation/cubit/recurring_cubit.dart';
+import 'package:fince/features/reports/domain/entities/report_entities.dart';
+import 'package:fince/features/reports/domain/repositories/report_repository.dart';
+import 'package:fince/features/reports/domain/usecases/get_cash_flow.dart';
+import 'package:fince/features/reports/domain/usecases/get_expenses_by_account.dart';
+import 'package:fince/features/reports/domain/usecases/get_expenses_by_category.dart';
+import 'package:fince/features/reports/domain/usecases/get_income_vs_expense.dart';
+import 'package:fince/features/reports/presentation/cubit/reports_cubit.dart';
 import 'package:fince/features/transactions/domain/entities/transaction_filter.dart';
 import 'package:fince/features/transactions/domain/repositories/transaction_repository.dart';
 import 'package:fince/features/transactions/domain/usecases/create_transaction.dart';
@@ -79,6 +86,8 @@ class _MockRecurringRepository extends Mock
 class _MockBudgetRepository extends Mock implements BudgetRepository {}
 
 class _MockGoalRepository extends Mock implements GoalRepository {}
+
+class _MockReportRepository extends Mock implements ReportRepository {}
 
 void main() {
   setUpAll(() {
@@ -197,6 +206,44 @@ void main() {
       depositToGoal: DepositToGoal(goalRepo),
     );
 
+    final reportRepo = _MockReportRepository();
+    when(
+      () => reportRepo.getIncomeVsExpense(
+        start: any(named: 'start'),
+        end: any(named: 'end'),
+      ),
+    ).thenAnswer(
+      (_) async => IncomeExpenseReport(
+        income: Money(0, 'BRL'),
+        expenses: Money(0, 'BRL'),
+        result: Money(0, 'BRL'),
+      ),
+    );
+    when(
+      () => reportRepo.getCashFlow(
+        start: any(named: 'start'),
+        end: any(named: 'end'),
+      ),
+    ).thenAnswer((_) async => const []);
+    when(
+      () => reportRepo.getExpensesByCategory(
+        start: any(named: 'start'),
+        end: any(named: 'end'),
+      ),
+    ).thenAnswer((_) async => const []);
+    when(
+      () => reportRepo.getExpensesByAccount(
+        start: any(named: 'start'),
+        end: any(named: 'end'),
+      ),
+    ).thenAnswer((_) async => const []);
+    final reportsCubit = ReportsCubit(
+      incomeVsExpense: GetIncomeVsExpense(reportRepo),
+      cashFlow: GetCashFlow(reportRepo),
+      byCategory: GetExpensesByCategory(reportRepo),
+      byAccount: GetExpensesByAccount(reportRepo),
+    );
+
     await tester.pumpWidget(
       FinceApp(
         router: AppRouter(
@@ -209,6 +256,7 @@ void main() {
           recurringCubit,
           budgetsCubit,
           goalsCubit,
+          reportsCubit,
         ).router,
         authCubit: authCubit,
       ),
