@@ -78,6 +78,12 @@ import '../../features/reports/domain/usecases/get_expenses_by_account.dart';
 import '../../features/reports/domain/usecases/get_expenses_by_category.dart';
 import '../../features/reports/domain/usecases/get_income_vs_expense.dart';
 import '../../features/reports/presentation/cubit/reports_cubit.dart';
+import '../../features/sync/data/datasources/dio_sync_remote_source.dart';
+import '../../features/sync/data/datasources/sync_local_data_source.dart';
+import '../../features/sync/data/repositories/sync_repository_impl.dart';
+import '../../features/sync/data/sync_manager.dart';
+import '../../features/sync/domain/repositories/sync_remote_source.dart';
+import '../../features/sync/domain/repositories/sync_repository.dart';
 import '../../features/transactions/data/datasources/transaction_local_data_source.dart';
 import '../../features/transactions/data/repositories/transaction_repository_impl.dart';
 import '../../features/transactions/domain/repositories/transaction_repository.dart';
@@ -125,6 +131,7 @@ Future<void> configureDependencies(AppConfig config) async {
   _registerGoalsModule();
   _registerReportsModule();
   _registerInsightsModule();
+  _registerSyncModule();
   sl.registerLazySingleton<AppRouter>(
     () => AppRouter(
       sl<AuthCubit>(),
@@ -392,5 +399,20 @@ void _registerInsightsModule() {
   sl.registerLazySingleton<GenerateInsights>(() => GenerateInsights(sl()));
   sl.registerLazySingleton<InsightsCubit>(
     () => InsightsCubit(generateInsights: sl()),
+  );
+}
+
+void _registerSyncModule() {
+  sl.registerLazySingleton<SyncLocalDataSource>(
+    () => SyncLocalDataSource(sl<AppDatabase>()),
+  );
+  sl.registerLazySingleton<SyncRepository>(
+    () => SyncRepositoryImpl(local: sl()),
+  );
+  sl.registerLazySingleton<SyncRemoteSource>(
+    () => DioSyncRemoteSource(sl<Dio>()),
+  );
+  sl.registerLazySingleton<SyncManager>(
+    () => SyncManager(repository: sl(), remote: sl()),
   );
 }
