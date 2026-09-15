@@ -5,6 +5,7 @@ part 'app_database.g.dart';
 /// Monetary amounts are stored as integer minor units (see `Money`); `currency`
 /// is the ISO 4217 code. All primary keys are client-generated UUID strings.
 
+@DataClassName('AccountRow')
 class Accounts extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
@@ -22,6 +23,7 @@ class Accounts extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('CategoryRow')
 class Categories extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
@@ -35,6 +37,7 @@ class Categories extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('TransactionRow')
 @TableIndex(name: 'idx_transactions_account_date', columns: {#accountId, #date})
 @TableIndex(name: 'idx_transactions_category_date', columns: {#categoryId, #date})
 class Transactions extends Table {
@@ -62,6 +65,7 @@ class Transactions extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('CreditCardRow')
 class CreditCards extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
@@ -79,6 +83,7 @@ class CreditCards extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('CreditCardInvoiceRow')
 @TableIndex(name: 'idx_invoices_card', columns: {#creditCardId})
 class CreditCardInvoices extends Table {
   TextColumn get id => text()();
@@ -97,6 +102,7 @@ class CreditCardInvoices extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('InstallmentRow')
 @TableIndex(name: 'idx_installments_invoice', columns: {#creditCardInvoiceId})
 @TableIndex(name: 'idx_installments_transaction', columns: {#transactionId})
 class Installments extends Table {
@@ -115,6 +121,7 @@ class Installments extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('BudgetRow')
 @TableIndex(name: 'idx_budgets_month', columns: {#month})
 class Budgets extends Table {
   TextColumn get id => text()();
@@ -128,6 +135,7 @@ class Budgets extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('FinancialGoalRow')
 class FinancialGoals extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
@@ -143,6 +151,7 @@ class FinancialGoals extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('RecurringTransactionRow')
 class RecurringTransactions extends Table {
   TextColumn get id => text()();
   TextColumn get description => text()();
@@ -165,6 +174,7 @@ class RecurringTransactions extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('FinancialInsightRow')
 class FinancialInsights extends Table {
   TextColumn get id => text()();
   TextColumn get type => text()();
@@ -180,6 +190,7 @@ class FinancialInsights extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('SyncOperationRow')
 @TableIndex(name: 'idx_sync_status', columns: {#status})
 class SyncOperations extends Table {
   TextColumn get id => text()();

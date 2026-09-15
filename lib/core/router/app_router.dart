@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/accounts/presentation/cubit/accounts_cubit.dart';
+import '../../features/accounts/presentation/screens/account_form_screen.dart';
+import '../../features/accounts/presentation/screens/accounts_screen.dart';
+import '../../features/accounts/presentation/screens/transfer_screen.dart';
 import '../../features/auth/presentation/cubit/auth_cubit.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
@@ -8,9 +13,10 @@ import '../../features/auth/presentation/screens/register_screen.dart';
 
 /// Typed application router with auth redirect guards.
 class AppRouter {
-  AppRouter(this._authCubit);
+  AppRouter(this._authCubit, this._accountsCubit);
 
   final AuthCubit _authCubit;
+  final AccountsCubit _accountsCubit;
 
   late final GoRouter router = GoRouter(
     initialLocation: '/',
@@ -46,6 +52,38 @@ class AppRouter {
         name: 'home',
         builder: (context, state) => const _HomePlaceholder(),
       ),
+      GoRoute(
+        path: '/accounts',
+        name: 'accounts',
+        builder: (context, state) => BlocProvider.value(
+          value: _accountsCubit,
+          child: const AccountsScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/accounts/new',
+        name: 'newAccount',
+        builder: (context, state) => BlocProvider.value(
+          value: _accountsCubit,
+          child: const AccountFormScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/accounts/transfer',
+        name: 'transfer',
+        builder: (context, state) => BlocProvider.value(
+          value: _accountsCubit,
+          child: const TransferScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/accounts/:id',
+        name: 'editAccount',
+        builder: (context, state) => BlocProvider.value(
+          value: _accountsCubit,
+          child: AccountFormScreen(accountId: state.pathParameters['id']),
+        ),
+      ),
     ],
   );
 }
@@ -58,7 +96,19 @@ class _HomePlaceholder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Fince')),
-      body: const Center(child: Text('Dashboard em breve')),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Dashboard em breve'),
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: () => context.go('/accounts'),
+              child: const Text('Ver contas'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

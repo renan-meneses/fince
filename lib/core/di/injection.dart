@@ -1,6 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../features/accounts/data/datasources/account_local_data_source.dart';
+import '../../features/accounts/data/repositories/account_repository_impl.dart';
+import '../../features/accounts/domain/repositories/account_repository.dart';
+import '../../features/accounts/domain/usecases/archive_account.dart';
+import '../../features/accounts/domain/usecases/create_account.dart';
+import '../../features/accounts/domain/usecases/transfer_between_accounts.dart';
+import '../../features/accounts/domain/usecases/update_account.dart';
+import '../../features/accounts/domain/usecases/watch_accounts.dart';
+import '../../features/accounts/presentation/cubit/accounts_cubit.dart';
 import '../../features/auth/data/datasources/auth_local_data_source.dart';
 import '../../features/auth/data/datasources/auth_remote_data_source.dart';
 import '../../features/auth/data/repositories/auth_repository_impl.dart';
@@ -40,7 +49,10 @@ Future<void> configureDependencies(AppConfig config) async {
   final database = await openAppDatabase();
   sl.registerLazySingleton<AppDatabase>(() => database);
 
-  sl.registerLazySingleton<AppRouter>(() => AppRouter(sl<AuthCubit>()));
+  _registerAccountsModule();
+  sl.registerLazySingleton<AppRouter>(
+    () => AppRouter(sl<AuthCubit>(), sl<AccountsCubit>()),
+  );
 }
 
 void _registerAuthModule() {
@@ -69,6 +81,31 @@ void _registerAuthModule() {
       forgotPassword: sl(),
       getCurrentUser: sl(),
       authenticateWithBiometrics: sl(),
+    ),
+  );
+}
+
+void _registerAccountsModule() {
+  sl.registerLazySingleton<AccountLocalDataSource>(
+    () => AccountLocalDataSource(sl<AppDatabase>()),
+  );
+  sl.registerLazySingleton<AccountRepository>(
+    () => AccountRepositoryImpl(local: sl()),
+  );
+  sl.registerLazySingleton<WatchAccounts>(() => WatchAccounts(sl()));
+  sl.registerLazySingleton<CreateAccount>(() => CreateAccount(sl()));
+  sl.registerLazySingleton<UpdateAccount>(() => UpdateAccount(sl()));
+  sl.registerLazySingleton<ArchiveAccount>(() => ArchiveAccount(sl()));
+  sl.registerLazySingleton<TransferBetweenAccounts>(
+    () => TransferBetweenAccounts(sl()),
+  );
+  sl.registerLazySingleton<AccountsCubit>(
+    () => AccountsCubit(
+      watchAccounts: sl(),
+      createAccount: sl(),
+      updateAccount: sl(),
+      archiveAccount: sl(),
+      transferBetweenAccounts: sl(),
     ),
   );
 }
