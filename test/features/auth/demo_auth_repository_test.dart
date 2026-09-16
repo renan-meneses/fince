@@ -49,4 +49,14 @@ void main() {
       throwsA(isA<AuthenticationFailure>()),
     );
   });
+
+  test('currentUser returns the demo user without login', () async {
+    final local = _MockAuthLocalDataSource();
+    final repository = DemoAuthRepository(local: local);
+
+    final user = await repository.currentUser();
+
+    expect(user, isNotNull);
+    expect(user!.email, 'demo@fince.app');
+  });
 }

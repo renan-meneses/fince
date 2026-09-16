@@ -49,11 +49,7 @@ class DemoAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<User?> currentUser() async {
-    final token = await _local.readAccessToken();
-    if (token == null || token.isEmpty) return null;
-    return (await _local.readUser())?.toEntity() ?? _demoUser;
-  }
+  Future<User?> currentUser() async => _demoUser;
 
   @override
   Future<bool> isBiometricEnabled() => _local.readBiometricEnabled();
