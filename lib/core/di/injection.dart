@@ -10,10 +10,7 @@ import '../../features/accounts/domain/usecases/transfer_between_accounts.dart';
 import '../../features/accounts/domain/usecases/update_account.dart';
 import '../../features/accounts/domain/usecases/watch_accounts.dart';
 import '../../features/accounts/presentation/cubit/accounts_cubit.dart';
-import '../../features/auth/data/datasources/auth_local_data_source.dart';
-import '../../features/auth/data/datasources/auth_remote_data_source.dart';
-import '../../features/auth/data/repositories/auth_repository_impl.dart';
-import '../../features/auth/data/repositories/demo_auth_repository.dart';
+import '../../features/auth/data/repositories/local_auth_repository.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/authenticate_with_biometrics.dart';
 import '../../features/auth/domain/usecases/forgot_password.dart';
@@ -118,7 +115,7 @@ Future<void> configureDependencies(AppConfig config) async {
     ),
   );
 
-  _registerAuthModule(demoMode: config.demoMode);
+  _registerAuthModule();
 
   final database = await openAppDatabase();
   sl.registerLazySingleton<AppDatabase>(() => database);
@@ -155,22 +152,8 @@ Future<void> configureDependencies(AppConfig config) async {
   );
 }
 
-void _registerAuthModule({required bool demoMode}) {
-  sl.registerLazySingleton<AuthLocalDataSource>(
-    () => AuthLocalDataSource(sl<SecureStorage>()),
-  );
-  if (demoMode) {
-    sl.registerLazySingleton<AuthRepository>(
-      () => DemoAuthRepository(local: sl()),
-    );
-  } else {
-    sl.registerLazySingleton<AuthRemoteDataSource>(
-      () => AuthRemoteDataSource(sl<Dio>()),
-    );
-    sl.registerLazySingleton<AuthRepository>(
-      () => AuthRepositoryImpl(remote: sl(), local: sl()),
-    );
-  }
+void _registerAuthModule() {
+  sl.registerLazySingleton<AuthRepository>(() => const LocalAuthRepository());
   sl.registerLazySingleton<Login>(() => Login(sl()));
   sl.registerLazySingleton<Register>(() => Register(sl()));
   sl.registerLazySingleton<Logout>(() => Logout(sl()));

@@ -13,6 +13,8 @@ and recurring transactions through a clean, offline-first, fintech-style interfa
 
 ## Highlights
 
+- **No login required** — the app runs fully offline with a local user; authentication is
+  reserved for future cloud synchronization.
 - **Feature-first Clean Architecture** — strict layering (`domain` / `data` / `presentation`).
 - **Offline-first** — Drift (SQLite) is the source of truth; a sync queue replays mutations
   to any remote backend when connectivity returns.
@@ -94,15 +96,21 @@ flutter run
 
 ## Demo mode
 
-Run the app with pre-seeded sample data and a mock login (no backend needed):
+Run the app with the local database pre-seeded with sample data (no login, opens directly on
+the dashboard):
 
 ```bash
 flutter run -t lib/main_demo.dart
 ```
 
-Log in with **email:** `demo@fince.app` · **password:** `demo123`. The demo database is
-seeded with 3 accounts, 15 categories, 13 transactions (income/expenses/transfer), a credit
-card with a 6-installment purchase, 3 budgets, 2 goals, and 3 recurring transactions.
+The demo database is seeded with 3 accounts, 15 categories, 13 transactions
+(income/expenses/transfer), a credit card with a 6-installment purchase, 3 budgets, 2 goals,
+and 3 recurring transactions. The default entrypoint (`flutter run`) behaves the same but starts
+with an empty database.
+
+> **Cloud sync (future):** the sync queue (`POST /sync`), JWT auth, and the FastAPI backend in
+> [`backend/`](backend/README.md) are ready; `demo@fince.app` / `demo123` are the backend's demo
+> credentials, used only when cloud sync is enabled.
 
 ## Branding & assets
 

@@ -6,9 +6,8 @@ import 'core/di/injection.dart';
 import 'core/router/app_router.dart';
 import 'features/auth/presentation/cubit/auth_cubit.dart';
 
-/// Demo entrypoint. Seeded with sample data; log in with:
-///   email: demo@fince.app
-///   senha: demo123
+/// Demo entrypoint. No login — opens directly on the dashboard with the local
+/// database pre-seeded with sample data.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await configureDependencies(AppConfig.demo());

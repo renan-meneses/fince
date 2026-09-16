@@ -21,7 +21,7 @@ class AppConfig {
   final bool enableCrashlytics;
   final bool enablePushNotifications;
 
-  /// Uses [DemoAuthRepository] and seeds the local DB with sample data.
+  /// Seeds the local DB with sample data on startup (demo/demo mode).
   final bool demoMode;
 
   bool get isProduction => environment == AppEnvironment.production;
